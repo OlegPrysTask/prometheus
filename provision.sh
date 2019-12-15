@@ -25,7 +25,7 @@ net.bridge.bridge-nf-call-iptables = 1
 EOF
 sysctl --system
 echo 1 > /proc/sys/net/ipv4/ip_forward
-kubeadm init --apiserver-advertise-address=10.10.1.4 --pod-network-cidr=10.11.0.0/16
+kubeadm init --apiserver-advertise-address=172.17.8.101 --pod-network-cidr=172.17.8.0/24
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
