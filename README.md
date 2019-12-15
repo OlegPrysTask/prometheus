@@ -3,12 +3,11 @@ prometheus example
 
 1. vagrant up 
 2. vagrant scp . master:/home/vagrant/
-3. chmod +x provision.sh
+3. chmod +x /home/vagrant/provision.sh
 4. ./home/vagrant/provision.sh 
-
-5. open Grafana/Prometheus/AlertManager 
+5. kubectl apply -f manifests-all.yaml
+6. open Grafana/Prometheus/AlertManager: 
 http://localhost:30001/
-admin:admin
 http://localhost:30002/graph
 http://localhost:30003/#/alerts
 
