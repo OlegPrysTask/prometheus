@@ -1,0 +1,66 @@
+apiVersion: v1
+data:
+  MY4.rules: |
+    ALERT MY4
+      IF (sum (container_memory_working_set_bytes{id="/",instance=~"master"})) / sum (machine_memory_bytes{instance=~"master"}) * 100) > 70  
+      FOR 2m
+      LABELS {
+        severity="page"
+      }
+      ANNOTATIONS {
+        SUMMARY = "{{$labels.instance}}: memory usage of one of the pods > 70% of the node memory where it is running",
+        DESCRIPTION = "{{$labels.instance}}: Memory usage is above 70% (current value is: {{ $value }})"
+      } 
+
+  MY3.rules: |
+    ALERT MY3
+      IF (sum (machine_memory_bytes{instance=~"master"}) - (sum (container_memory_working_set_bytes{id="/",instance=~"master"}))) / (sum (machine_memory_bytes{instance=~"master"})) > 30    
+      FOR 15m
+      LABELS {
+        severity="page"
+      }
+      ANNOTATIONS {
+        SUMMARY = "{{$labels.instance}}: sum of cpu usages of the processes which are not kubernetes pods > 30% during 15m",
+        DESCRIPTION = "{{$labels.instance}}: Memory usage non kubernetes is above 30% (current value is: {{ $value }})"
+      }
+
+  MY1.rules: |
+    ALERT MY1
+      IF absent(up{job="kube-controller-manager"} == 1)
+      FOR 15m
+      LABELS {
+        severity="critical"
+      }
+      ANNOTATIONS {
+        SUMMARY = "KubeControllerManager has down",
+        DESCRIPTION = "KubeControllerManager on {{$labels.namespace}}/{{$labels.pod}} has down"
+      }
+
+  MY22.rules: |
+    ALERT MY22
+      IF (200 - (sum(irate(node_cpu{mode="idle"}[5m])) * 100)) > 85
+      FOR 15m
+      LABELS {
+        severity="page"
+      }
+      ANNOTATIONS {
+        SUMMARY = "{{$labels.instance}}: High CPU usage detected",
+        DESCRIPTION = "{{$labels.instance}}: CPU usage is above 85% (current value is: {{ $value }})"
+      }
+      
+  MY2.rules: |
+    ALERT MY2
+      IF (sum(rate(container_cpu_usage_seconds_total{instance"master"}[1m])) /sum (machine_cpu_cores{instance=~"master"}) * 100) > 85
+      FOR 15m
+      LABELS {
+        severity="HIGH"
+      }
+      ANNOTATIONS {
+        SUMMARY = "{{$labels.instance}}: cpu usage of one of the node > 85% during 15m",
+        DESCRIPTION = "{{$labels.instance}}: CPU usage is above 85% (current value is: {{ $value }})"
+      }
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: prometheus-rules
+  namespace: monitoring
